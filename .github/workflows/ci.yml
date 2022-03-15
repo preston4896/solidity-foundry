@@ -5,12 +5,13 @@ name: Foundry CI
 # Controls when the workflow will run
 on: 
   push:
+    tags:
+      - "v*.*.*"
     branches:
       - main
   pull_request:
     branches:
       - main
-      - release*/**
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -35,3 +36,12 @@ jobs:
 
       - name: Run tests
         run: forge test -vvv
+
+      - name: Release ABI
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          name: ABIs
+          files: |
+            ./out/Calculator.sol/Calculator.json
+          # specify ABIs here...
