@@ -5,8 +5,13 @@ import "ds-test/test.sol";
 import "../Calculator.sol";
 import "./console.sol";
 
+interface CheatCodes {
+    function assume(bool) external;
+}
+
 contract CalculatorTest is DSTest {
     Calculator calculator;
+    CheatCodes cheats = CheatCodes(HEVM_ADDRESS);
 
     function setUp() public {
         calculator = new Calculator(0);
@@ -36,13 +41,19 @@ contract CalculatorTest is DSTest {
         require(calculator.sub(a) == initial - a);
     }
 
-    function testMultWithFuzzing(uint256 a) public {
-        require(calculator.mult(a) == 0);
+    function testMultWithFuzzing(uint256 a, uint256 b) public {
+        uint256 max = type(uint256).max;
+        // prevents overflowing
+        cheats.assume(a > 0);
+        cheats.assume(a <= max);
+        cheats.assume(b <= max / a);
+        calculator.add(a);
+        require(calculator.mult(b) == a * b);
     }
 
-    function testDivWithFuzzing(uint256 a) public {
-        uint256 initial = calculator.add(a);
-        require(calculator.getNumber() == initial);
-        require(calculator.div(2) == a / 2);
+    function testDivWithFuzzing(uint256 a, uint256 b) public {
+        calculator.add(a);
+        cheats.assume(b > 0);
+        require(calculator.div(b) == a / b);
     }
 }
