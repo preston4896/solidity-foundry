@@ -41,7 +41,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/v')
         with:
-          name: ABIs
+          name: ABIs-${{ github.ref }}
           files: |
             ./out/Calculator.sol/Calculator.json
           # specify ABIs here...
