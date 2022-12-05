@@ -5,7 +5,6 @@ import "forge-std/Script.sol";
 import "../src/Calculator.sol";
 
 contract MyScript is Script {
-    
     function setUp() public {}
 
     function run() external {
