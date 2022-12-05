@@ -1,17 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-import "ds-test/test.sol";
+import "forge-std/Test.sol";
 import "../Calculator.sol";
-import "./console.sol";
 
-interface CheatCodes {
-    function assume(bool) external;
-}
-
-contract CalculatorTest is DSTest {
+contract CalculatorTest is Test {
     Calculator calculator;
-    CheatCodes cheats = CheatCodes(HEVM_ADDRESS);
 
     function setUp() public {
         calculator = new Calculator(0);
@@ -44,16 +38,16 @@ contract CalculatorTest is DSTest {
     function testMultWithFuzzing(uint256 a, uint256 b) public {
         uint256 max = type(uint256).max;
         // prevents overflowing
-        cheats.assume(a > 0);
-        cheats.assume(a <= max);
-        cheats.assume(b <= max / a);
+        vm.assume(a > 0);
+        vm.assume(a <= max);
+        vm.assume(b <= max / a);
         calculator.add(a);
         require(calculator.mult(b) == a * b);
     }
 
     function testDivWithFuzzing(uint256 a, uint256 b) public {
         calculator.add(a);
-        cheats.assume(b > 0);
+        vm.assume(b > 0);
         require(calculator.div(b) == a / b);
     }
 }
