@@ -24,8 +24,6 @@ jobs:
         id: slither
         continue-on-error: true
         with:
-          target: 'evm/'
-          slither-config: 'evm/slither.config.json'
           slither-args: '--checklist --markdown-root ${{ env.commit_url }}'
       
       # - name: Create Slither Checklist as a PR Comment
@@ -42,7 +40,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           body="# Slither Report \n ${{ steps.slither.outputs.stdout }}"
-          echo $body > ./report.md
+          echo "$body" > ./report.md
 
       - name: Create Slither PR Comment
         if: github.event_name == 'pull_request'
