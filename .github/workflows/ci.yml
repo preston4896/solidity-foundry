@@ -43,11 +43,14 @@ jobs:
         run: |
           echo ::set-output name=tag::${GITHUB_REF#refs/*/}
 
-      - name: Release ABI
+      - name: Compress Artifact
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          tar -czvf abi-${{ steps.version.outputs.tag }}.tar.gz ./out
+
+      - name: Release ABI Archive
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           name: ABIs-${{ steps.version.outputs.tag }}
-          files: |
-            ./out/Calculator.sol/Calculator.json
-          # specify ABIs here...
+          files: abi-${{ steps.version.outputs.tag }}.tar.gz
