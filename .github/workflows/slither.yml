@@ -36,17 +36,17 @@ jobs:
       #       const body = `${{ steps.slither.outputs.stdout }}`
       #       await script({ github, context, header, body })
 
-      - name: Use Slither Output To Generate Markdown Report
-        if: github.event_name == 'pull_request'
-        run: |
-          body="# Slither Report \n ${{ steps.slither.outputs.stdout }}"
-          echo "$body" > ./report.md
+      # - name: Use Slither Output To Generate Markdown Report
+      #   if: github.event_name == 'pull_request'
+      #   run: |
+      #     body="# Slither Report \n ${{ steps.slither.outputs.stdout }}"
+      #     echo "$body" > ./report.md
 
       - name: Create Slither PR Comment
         if: github.event_name == 'pull_request'
         uses: thollander/actions-comment-pull-request@v2
         with:
-          filePath: ./report.md
+          message: ${{ steps.slither.outputs.stdout }}
 
       # - name: Render Report
       #   id: report
