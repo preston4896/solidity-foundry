@@ -1,0 +1,63 @@
+name: Slither Static Analysis
+
+# Runs the test on every Sunday at 12am GMT
+on: 
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+
+    env:
+      commit_url: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}/
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Run Slither
+        uses: tlvince/slither-action@2160acd392a54de83b9d650a144f8cc6d5bb9a0b
+        id: slither
+        continue-on-error: true
+        with:
+          target: 'evm/'
+          slither-config: 'evm/slither.config.json'
+          slither-args: '--checklist --markdown-root ${{ env.commit_url }}'
+      
+      # - name: Create Slither Checklist as a PR Comment
+      #   uses: actions/github-script@v5.1.0
+      #   if: github.event_name == 'pull_request'
+      #   with:
+      #     script: |
+      #       const script = require('.github/scripts/slither-comment')
+      #       const header = '# Slither report'
+      #       const body = `${{ steps.slither.outputs.stdout }}`
+      #       await script({ github, context, header, body })
+
+      - name: Use Slither Output To Generate Markdown Report
+        if: github.event_name == 'pull_request'
+        run: |
+          body="# Slither Report \n ${{ steps.slither.outputs.stdout }}"
+          echo $body > ./report.md
+
+      - name: Create Slither PR Comment
+        if: github.event_name == 'pull_request'
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          filePath: ./report.md
+
+      # - name: Render Report
+      #   id: report
+      #   uses: chuhlomin/render-template@v1.4
+      #   with:
+      #     template: ./report.md
+
+      # - name: Create comment
+      #   uses: peter-evans/create-or-update-comment@v2
+      #   with:
+      #     issue-number: 1
+      #     body: ${{ steps.report.outputs.result }}
