@@ -21,15 +21,40 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Run Slither
-        uses: tlvince/slither-action@2160acd392a54de83b9d650a144f8cc6d5bb9a0b
-        id: slither
-        continue-on-error: true
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          slither-args: '--checklist --markdown-root ${{ env.commit_url }}'
+          python-version: '3.x'
+          cache: 'pip'
+
+      - name: Install Slither and dependencies
+        run: |
+          python -m pip install --upgrade pip slither-analyzer
+          pip install -r requirements.txt
+
+      - name: Install Foundry
+        uses: onbjerg/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Run Slither
+        id: slither
+        run: |
+          slither . --checklist --markdown-root ${{ env.commit_url }} > ./report.md || true
+
+      - name: Insert Header
+        run: |
+          sed -i '1s/^/# Slither Report \n\n/' report.md
+
+      # - name: Run Slither
+      #   uses: tlvince/slither-action@2160acd392a54de83b9d650a144f8cc6d5bb9a0b
+      #   id: slither
+      #   continue-on-error: true
+      #   with:
+      #     slither-args: '--checklist --markdown-root ${{ env.commit_url }}'
       
       - name: Create Slither PR Comment
         if: github.event_name == 'pull_request'
         uses: thollander/actions-comment-pull-request@v2
         with:
-          message: ${{ steps.slither.outputs.stdout }}
+          filePath: ./report.md
