@@ -44,13 +44,6 @@ jobs:
       - name: Insert Header
         run: |
           sed -i '1s/^/# Slither Report \n\n/' report.md
-
-      # - name: Run Slither
-      #   uses: tlvince/slither-action@2160acd392a54de83b9d650a144f8cc6d5bb9a0b
-      #   id: slither
-      #   continue-on-error: true
-      #   with:
-      #     slither-args: '--checklist --markdown-root ${{ env.commit_url }}'
       
       - name: Create Slither PR Comment
         if: github.event_name == 'pull_request'
