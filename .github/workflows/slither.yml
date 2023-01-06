@@ -1,9 +1,7 @@
 name: Slither Static Analysis
 
-# Runs the test on every Sunday at 12am GMT
+# Runs only on PR merging to main
 on: 
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
     types: [ opened, reopend, synchronize, ready_for_review ]
@@ -13,6 +11,9 @@ on:
 jobs:
   analyze:
     runs-on: ubuntu-latest
+
+    # Do not run when PR is still a draft
+    if: ${{ !github.event.pull_request.draft }}
 
     env:
       commit_url: ${{ github.server_url }}/${{ github.repository }}/blob/${{ github.sha }}/
