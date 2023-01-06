@@ -6,6 +6,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+    types: [ opened, reopend, synchronize, ready_for_review ]
 
   workflow_dispatch:
 
