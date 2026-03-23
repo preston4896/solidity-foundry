@@ -2,3 +2,6 @@ cache
 out
 broadcast
 .venv
+.env
+keystore
+deployment/31337.json

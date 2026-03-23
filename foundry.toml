@@ -2,19 +2,71 @@
 src = 'src'
 out = 'out'
 libs = ['lib']
-gas_reports = ['*']
+solc_version = "0.8.28"
+evm_version = "cancun"
 optimizer = true
-optimizer_runs = 200
-solc_version = "0.8.10"
-fuzz_runs = 300
+optimizer_runs = 1000000
+via_ir = true
+bytecode_hash = "none"
+ffi = true
+fs_permissions = [
+    { access = "read", path = "./" },
+    { access = "read-write", path = "./deployment" }
+]
+remappings = [
+    "forge-std/=lib/forge-std/src/"
+]
 
-[profile.fuzzing]
-fuzz_runs = 20000
+# [fmt]
+# line_length = 120
+# tab_width = 2
+# multiline_func_header = 'params_first'
+# quote_style = 'double'
+# wrap_comments = true
+# sort_imports = true
 
 [rpc_endpoints]
-mainnet = "${RPC_URL}"
+anvil = "http://localhost:8545"
+# testnets
+sepolia = "${SEPOLIA_RPC_URL}"
+hoodi = "${HOODI_TESTNET_RPC_URL}"
+optimism_sepolia = "${OP_SEPOLIA_RPC_URL}"
+arbitrum_sepolia = "${ARBITRUM_SEPOLIA_RPC_URL}"
+base_sepolia = "${BASE_SEPOLIA_RPC_URL}"
+world_sepolia = "${WORLD_SEPOLIA_RPC_URL}"
+bsc_testnet = "${BSC_TESTNET_RPC_URL}"
+polygon_amoy = "${POLYGON_AMOY_RPC_URL}"
+unichain_sepolia = "${UNICHAIN_SEPOLIA_RPC_URL}"
+# mainnets
+mainnet = "${ETHEREUM_RPC_URL}"
+optimism = "${OP_RPC_URL}"
+arbitrum = "${ARBITRUM_RPC_URL}"
+base = "${BASE_RPC_URL}"
+world = "${WORLD_RPC_URL}"
+bsc = "${BSC_RPC_URL}"
+polygon_pos = "${POLYGON_RPC_URL}"
+megaeth_mainnet = "${MEGAETH_RPC_URL}"
 
 [etherscan]
+base_sepolia = { key = "${ETHERSCAN_API_KEY}" }
+hoodi = { key = "${ETHERSCAN_API_KEY}" }
+sepolia = { key = "${ETHERSCAN_API_KEY}" }
+optimism_sepolia = { key = "${ETHERSCAN_API_KEY}" }
+arbitrum_sepolia = { key = "${ETHERSCAN_API_KEY}" }
+world_sepolia = { key = "${ETHERSCAN_API_KEY}" }
+bsc_testnet = { key = "${ETHERSCAN_API_KEY}" }
+polygon_amoy = { key = "${ETHERSCAN_API_KEY}", chain = 80002 }
+unichain_sepolia = { key = "${ETHERSCAN_API_KEY}", chain = 1301 }
 mainnet = { key = "${ETHERSCAN_API_KEY}" }
+base = { key = "${ETHERSCAN_API_KEY}" }
+optimism = { key = "${ETHERSCAN_API_KEY}" }
+arbitrum = { key = "${ETHERSCAN_API_KEY}" }
+world = { key = "${ETHERSCAN_API_KEY}" }
+bsc = { key = "${ETHERSCAN_API_KEY}" }
+polygon_pos = { key = "${ETHERSCAN_API_KEY}" }
+megaeth_mainnet = { key = "${ETHERSCAN_API_KEY}", chain = 4326 }
 
-# See more config options https://github.com/gakonst/foundry/tree/master/config
+[lint]
+lint_on_build = false
+
+# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

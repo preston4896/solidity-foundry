@@ -1,56 +1,36 @@
-# This is a basic workflow to help you get started with Actions
-
-name: Foundry CI
+name: Foundry Build CI/CD
 
 # Controls when the workflow will run
 on: 
   push:
-    tags:
-      - "v*.*.*"
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+  check:
+    strategy:
+      fail-fast: true
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    name: Foundry project
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Install Foundry
-        uses: onbjerg/foundry-toolchain@v1
+        uses: foundry-rs/foundry-toolchain@v1
         with:
           version: nightly
 
-      - name: Run tests
-        run: forge test -vvv
-
-      - name: Extract version
-        if: startsWith(github.ref, 'refs/tags/v')
-        id: version
+      - name: Run Forge build
         run: |
-          echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+          forge --version
+          forge build --sizes
+        id: build
 
-      - name: Compress Artifact
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Run Forge tests
         run: |
-          tar -czvf abi-${{ steps.version.outputs.tag }}.tar.gz ./out
-
-      - name: Release ABI Archive
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/v')
-        with:
-          name: ABIs-${{ steps.version.outputs.tag }}
-          files: abi-${{ steps.version.outputs.tag }}.tar.gz
+          forge test --gas-report > gasreport.ansi
+        id: test

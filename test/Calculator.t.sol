@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
+import "../src/Calculator.sol";
 import "forge-std/Test.sol";
-import "../Calculator.sol";
 
 contract CalculatorTest is Test {
     Calculator calculator;

@@ -4,7 +4,7 @@ name: Slither Static Analysis
 on: 
   pull_request:
     branches: [ main ]
-    types: [ opened, reopend, synchronize, ready_for_review ]
+    types: [ opened, reopened, synchronize, ready_for_review ]
 
   workflow_dispatch:
 
@@ -16,37 +16,20 @@ jobs:
     if: ${{ !github.event.pull_request.draft }}
 
     env:
-      commit_url: ${{ github.server_url }}/${{ github.repository }}/blob/${{ github.sha }}/
+      commit_url: ${{ github.server_url }}/${{ github.repository }}/blob/${{ github.event.pull_request.head.sha }}/
 
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
-          cache: 'pip'
-
-      - name: Install Slither and dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: Install Foundry
-        uses: onbjerg/foundry-toolchain@v1
-        with:
-          version: nightly
+      - uses: actions/checkout@v4
 
       - name: Run Slither
+        uses: crytic/slither-action@v0.4.0
         id: slither
-        run: |
-          slither . --checklist --markdown-root ${{ env.commit_url }} > ./report.md || true
-
-      - name: Insert Header
-        run: |
-          sed -i '1s/^/# Slither Report \n\n/' report.md
-      
-      - name: Create Slither PR Comment
-        if: github.event_name == 'pull_request'
-        uses: thollander/actions-comment-pull-request@v2
         with:
-          filePath: ./report.md
+          fail-on: none
+          slither-args: --checklist --show-ignored-findings --markdown-root ${{ env.commit_url }}
+          sarif: results.sarif
+      
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ steps.slither.outputs.sarif }}
